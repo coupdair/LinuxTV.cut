@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version=v0.1.0
+version=v0.1.1
 
 #a few color in bash
 TC_LightRed="\033[1;31m"
@@ -21,8 +21,15 @@ do
     /bin/echo -e "${TC_LightRed}error:${TC_clear} $fo do not exist."
     continue
   fi
-  echo '  '$d2
-  echo '  '$d4
+
+  #probe Video/Audio channels
+  v2=`ffprobe $f  2>&1 | grep Stream | grep Video | wc -l`
+  a2=`ffprobe $f  2>&1 | grep Stream | grep Audio | wc -l`
+  v4=`ffprobe $fo 2>&1 | grep Stream | grep Video | wc -l`
+  a4=`ffprobe $fo 2>&1 | grep Stream | grep Audio | wc -l`
+
+  echo '  '$d2'  V/A: '$v2'/'$a2
+  echo '  '$d4'  V/A: '$v4'/'$a4
   #convert duration to seconds
   today=`date +%Y/%m/%d`; s=`date -d $today +%s`
 #echo 'today '$today $s
@@ -36,6 +43,7 @@ do
   d=`echo $d4 | cut -d' ' -f2 | sed 's/,//g'`; ds=`date -d $d +%s`
   ((d4=ds-s))
 #echo $s $ds $d4
+
   #duration difference
   ((d=d4-d2))
   abs=`echo $d | tr -d -`; d=$abs
@@ -45,5 +53,9 @@ do
   else
     m=`units $d's' minutes -t | cut -d'.' -f1`
     /bin/echo -e ${TC_LightRed}"KO: difference is around "$d" s, i.e. "$m"min."${TC_clear}
+  fi
+  if(($a2!=$a4))
+  then
+    /bin/echo -e ${TC_LightCyan}"warning: Video/Audio differs"${TC_clear}', i.e. MPG='$v2'/'$a2' =! MP4='$v4'/'$a4
   fi
 done
