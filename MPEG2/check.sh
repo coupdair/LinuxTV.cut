@@ -1,5 +1,7 @@
 #!/bin/bash
 
+version=v0.1.0
+
 #a few color in bash
 TC_LightRed="\033[1;31m"
 TC_LightGreen="\033[1;32m"
